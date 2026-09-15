@@ -8,6 +8,7 @@
     "build:renderer": "vite build",
     "build": "npm run build:main && npm run build:renderer",
     "start": "npm run build && electron .",
+    "ssh-start": "DISPLAY=:0 npm start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jane Doe",

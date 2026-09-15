@@ -6,9 +6,9 @@ function createWindow(): void {
     width: 420,
     height: 800,
     show: false,
+    kiosk: true,
   });
 
-  win.maximize();
   win.show();
 
   win.loadFile(path.join(__dirname, "renderer/index.html"));
