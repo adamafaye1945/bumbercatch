@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 
 function createWindow(): void {
@@ -7,6 +7,9 @@ function createWindow(): void {
     height: 800,
     show: false,
     kiosk: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
 
   win.show();
@@ -28,4 +31,8 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+ipcMain.on("app-quit", () => {
+  app.quit();
 });
