@@ -5,7 +5,11 @@ function createWindow(): void {
   const win = new BrowserWindow({
     width: 420,
     height: 800,
+    show: false,
   });
+
+  win.maximize();
+  win.show();
 
   win.loadFile(path.join(__dirname, "renderer/index.html"));
 }
