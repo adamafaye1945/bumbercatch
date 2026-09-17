@@ -1,0 +1,5 @@
+venv
+.garmin_tokens
+__pycache__
+.env
+voice/models/*.onnx

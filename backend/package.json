@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "db:start": "bash scripts/ensure-db.sh",
+    "db:sync": "python/venv/bin/python python/garmin_sync.py || true",
+    "email:sync": "npm run build && node dist/scripts/icloudSyncOnce.js",
+    "start": "npm run db:start && npm run db:sync && electron ."
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "html-to-text": "^10.0.1",
+    "imapflow": "^2.0.5",
+    "mailparser": "^3.9.28",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/html-to-text": "^9.0.4",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^26.5.1",
+    "@types/pg": "^8.11.10",
+    "electron": "44.3.0",
+    "typescript": "^7.0.2"
+  }
+}

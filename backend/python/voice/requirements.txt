@@ -1,0 +1,10 @@
+openwakeword
+pywhispercpp
+pyaudio
+# webrtcvad imports the legacy `pkg_resources` API, which modern setuptools
+# (81+) no longer bundles -- pin below it or `import webrtcvad` fails outright.
+setuptools<81
+webrtcvad
+dateparser
+requests
+python-dotenv

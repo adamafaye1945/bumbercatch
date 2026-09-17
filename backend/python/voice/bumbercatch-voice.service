@@ -1,0 +1,26 @@
+# Sample systemd unit for running the voice daemon on the Raspberry Pi.
+# This is documentation only -- it hasn't been applied or tested (no systemd
+# on the macOS dev machine). Copy it into place and adjust paths/user, e.g.:
+#
+#   sudo cp bumbercatch-voice.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now bumbercatch-voice
+#   journalctl -u bumbercatch-voice -f   # tail logs
+
+[Unit]
+Description=Bumbercatch voice control daemon (wake word + whisper.cpp)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/bumbercatch-electron/backend/python/voice
+ExecStart=/home/pi/bumbercatch-electron/backend/python/voice/venv/bin/python3 daemon.py
+Restart=on-failure
+RestartSec=5
+# Voice daemon should always be listening, independent of the Electron app
+# process, so it starts on boot and restarts on its own if it crashes.
+
+[Install]
+WantedBy=multi-user.target
