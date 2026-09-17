@@ -9,6 +9,6 @@
     "build:backend": "npm run build --prefix backend",
     "build": "npm run build:frontend && npm run build:backend",
     "start": "npm run build && npm run start --prefix backend",
-    "ssh-start": "DISPLAY=:0 npm start"
+    "ssh-start": "DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority npm start"
   }
 }
