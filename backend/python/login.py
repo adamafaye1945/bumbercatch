@@ -28,10 +28,11 @@ def main() -> None:
         )
 
     client = Garmin(email, getpass("Garmin password: "))
-    # No tokenstore arg here -> does a fresh interactive login (prompts for an
-    # MFA code automatically if needed) instead of trying to load from disk.
-    client.login()
-    client.garth.dump(TOKEN_DIR)
+    # Passing TOKEN_DIR here does both jobs: it tries loading cached tokens
+    # from that path first, and falls back to a fresh interactive login
+    # (prompting for an MFA code if needed) using the credentials above --
+    # either way, it dumps the resulting tokens back to TOKEN_DIR itself.
+    client.login(TOKEN_DIR)
     print(f"Login OK — tokens cached in {TOKEN_DIR}")
 
 
