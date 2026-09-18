@@ -15,7 +15,7 @@ import { VoiceAssistPopup } from "@/components/common/VoiceAssistPopup";
 import { WeatherPopup } from "@/components/common/WeatherPopup";
 import { LoadingState } from "@/components/common/LoadingState";
 import { DataUnavailable } from "@/components/common/DataUnavailable";
-import { iconToEmoji } from "@/lib/weather";
+import { weatherIcon } from "@/lib/weather";
 import {
   useHomeStatus,
   useChecklist,
@@ -145,6 +145,7 @@ export function Home() {
     return <DataUnavailable />;
   }
 
+  const WeatherIcon = weatherIcon(homeStatus.weatherIcon);
   const doneCount = checklistItems.filter((item) => item.checked).length;
   const unreadNotifications = notifications.filter((n) => !n.read).length;
   const activeReminders = reminders
@@ -167,9 +168,9 @@ export function Home() {
           <button
             type="button"
             onClick={() => setWeatherOpen(true)}
-            className="transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1 align-middle transition-colors hover:text-foreground"
           >
-            {iconToEmoji(homeStatus.weatherIcon)} {homeStatus.weather}
+            <WeatherIcon className="size-4" /> {homeStatus.weather}
           </button>
         </div>
       </div>
