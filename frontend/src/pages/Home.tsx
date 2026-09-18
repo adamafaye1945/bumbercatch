@@ -39,6 +39,16 @@ function useNow(): Date {
   return now;
 }
 
+const USER_NAME = "Adama";
+
+function getGreeting(now: Date): string {
+  const hour = now.getHours();
+  if (hour >= 5 && hour < 12) return "Good morning";
+  if (hour >= 12 && hour < 17) return "Good afternoon";
+  if (hour >= 17 && hour < 21) return "Good evening";
+  return "Hello";
+}
+
 function formatDueAt(dueAt: string): string {
   return new Date(dueAt).toLocaleString(undefined, {
     weekday: "short",
@@ -176,6 +186,9 @@ export function Home() {
       </div>
 
       <div className="border-b border-border pb-6">
+        <div className="text-lg font-medium">
+          {getGreeting(now)}, {USER_NAME}
+        </div>
         <div className="text-4xl font-semibold tabular-nums">
           {now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
         </div>
