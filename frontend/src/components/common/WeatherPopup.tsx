@@ -6,7 +6,12 @@ import { weatherIcon } from "@/lib/weather";
 
 function formatDayLabel(date: string, index: number): string {
   if (index === 0) return "Today";
-  return new Date(date).toLocaleDateString(undefined, { weekday: "long" });
+  // date is a bare "YYYY-MM-DD" string -- new Date(date) parses that as UTC
+  // midnight, which rolls back to the previous calendar day once converted
+  // to a timezone behind UTC (e.g. US Eastern). Building the Date from local
+  // year/month/day components instead avoids that off-by-one entirely.
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(undefined, { weekday: "long" });
 }
 
 export function WeatherPopup({
