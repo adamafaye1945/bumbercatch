@@ -65,6 +65,13 @@ def _extract_due_at(text: str) -> tuple[Optional[str], str]:
     if not found:
         return None, text
     matched_text, dt = found[0]
+    # dateparser returns a naive datetime (no UTC offset). Without one, the
+    # backend's TIMESTAMPTZ column interprets the ISO string as UTC rather
+    # than local time, silently shifting "5pm" by several hours. astimezone()
+    # on a naive datetime attaches the system's actual local offset without
+    # changing the wall-clock numbers -- exactly what's needed here.
+    if dt.tzinfo is None:
+        dt = dt.astimezone()
     remaining = text.replace(matched_text, "").strip(" .,")
     remaining = LEFTOVER_TIME_WORDS.sub("", remaining).strip(" .,")
     return dt.isoformat(), remaining
