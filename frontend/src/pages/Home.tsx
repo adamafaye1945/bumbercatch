@@ -68,6 +68,7 @@ export function Home() {
   const [reminderOpen, setReminderOpen] = useState(false);
   const [weatherOpen, setWeatherOpen] = useState(false);
   const wasListeningRef = useRef(false);
+  const autoOpenedReminderIdsRef = useRef<Set<string>>(new Set());
 
   const homeStatusRes = useHomeStatus();
   const checklistRes = useChecklist();
@@ -105,6 +106,21 @@ export function Home() {
     }
     wasListeningRef.current = active;
   }, [homeStatus?.listening.active, queryClient]);
+
+  useEffect(() => {
+    const reminders = remindersRes.data;
+    if (!reminders) return;
+    // The moment a reminder's due time arrives, pop it up automatically --
+    // no need to wait for the user to click the banner. Tracked by id so it
+    // only auto-opens once per reminder, not on every tick while overdue.
+    const due = reminders
+      .filter((r) => !r.dismissedAt && new Date(r.dueAt).getTime() <= now.getTime())
+      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())[0];
+    if (due && !autoOpenedReminderIdsRef.current.has(due.id)) {
+      autoOpenedReminderIdsRef.current.add(due.id);
+      setReminderOpen(true);
+    }
+  }, [now, remindersRes.data]);
 
   function handleVoiceOpenChange(open: boolean) {
     setVoiceOpen(open);
