@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, Mail, HeartPulse, MapPin, Trash2 } from "lucide-react";
+import { Bell, Mail, HeartPulse, MapPin, RefreshCw, Trash2 } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import { StatGrid } from "@/components/common/StatGrid";
 import { StatTile } from "@/components/common/StatTile";
@@ -77,6 +79,7 @@ export function Home() {
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
   const [weatherOpen, setWeatherOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const wasListeningRef = useRef(false);
   const autoOpenedReminderIdsRef = useRef<Set<string>>(new Set());
 
@@ -141,6 +144,12 @@ export function Home() {
     }
   }
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    await queryClient.invalidateQueries();
+    setRefreshing(false);
+  }
+
   const checklistItems = checklistRes.data;
   const favoritePlaces = placesRes.data;
   const notifications = notificationsRes.data;
@@ -181,8 +190,12 @@ export function Home() {
 
   return (
     <div className="flex flex-1 flex-col gap-8">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start gap-2">
         <ThemeToggleButton />
+        <Button variant="outline" size="sm" disabled={refreshing} onClick={handleRefresh}>
+          <RefreshCw className={cn("size-4", refreshing && "animate-spin")} />
+          Refresh
+        </Button>
       </div>
 
       <div className="border-b border-border pb-6">
