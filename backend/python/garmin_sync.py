@@ -178,6 +178,9 @@ def main() -> None:
         updates["stress_caption"] = f"Avg today: {stress_value}"
 
     if updates:
+        # This only ever UPDATEs -- ensure the id=1 row exists first (relies
+        # on init.sql's column defaults) in case this runs before migrations do.
+        cur.execute("INSERT INTO garmin_stats (id) VALUES (1) ON CONFLICT (id) DO NOTHING")
         set_clause = ", ".join(f"{column} = %s" for column in updates)
         cur.execute(f"UPDATE garmin_stats SET {set_clause} WHERE id = 1", list(updates.values()))
     else:

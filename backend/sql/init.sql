@@ -14,12 +14,9 @@ ALTER TABLE checklist_items DROP CONSTRAINT IF EXISTS checklist_items_source_che
 ALTER TABLE checklist_items ADD CONSTRAINT checklist_items_source_check
   CHECK (source IN ('Calendar', 'Email', 'Reminder', 'Manual', 'Voice'));
 
-INSERT INTO checklist_items (id, label, checked, source) VALUES
-  ('t1', 'Standup at 10am', TRUE, 'Calendar'),
-  ('t2', 'Reply to JPMC email', TRUE, 'Email'),
-  ('t3', 'Gym session at 6pm', FALSE, 'Reminder'),
-  ('t4', 'Call dad about rentals', FALSE, 'Manual')
-ON CONFLICT (id) DO NOTHING;
+-- Real to-dos now come only from voice control (backend/python/voice/daemon.py)
+-- and, eventually, manual entry -- discard the old fake seed rows.
+DELETE FROM checklist_items WHERE id IN ('t1', 't2', 't3', 't4');
 
 CREATE TABLE IF NOT EXISTS emails (
   id      TEXT PRIMARY KEY,
@@ -105,30 +102,47 @@ INSERT INTO reminders (id, label, due_at, source) VALUES
   ('r1', 'Leave by 6:00 PM for the gym', (CURRENT_DATE + TIME '18:00')::timestamptz, 'manual')
 ON CONFLICT (id) DO NOTHING;
 
+-- Neutral defaults (not plausible-looking fake numbers) so a bare bootstrap
+-- row can exist for garmin_sync.py's UPDATE ... WHERE id = 1 to target --
+-- that script only ever updates this row, never inserts one itself.
 CREATE TABLE IF NOT EXISTS garmin_stats (
   id                   INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  body_battery_value   INTEGER NOT NULL,
-  body_battery_caption TEXT NOT NULL,
-  steps_value          INTEGER NOT NULL,
-  steps_goal           INTEGER NOT NULL,
-  resting_hr_value     INTEGER NOT NULL,
-  resting_hr_caption   TEXT NOT NULL,
-  sleep_total          TEXT NOT NULL,
-  sleep_deep_caption   TEXT NOT NULL,
-  stress_level         TEXT NOT NULL,
-  stress_caption       TEXT NOT NULL
+  body_battery_value   INTEGER NOT NULL DEFAULT 0,
+  body_battery_caption TEXT NOT NULL DEFAULT 'No data yet',
+  steps_value          INTEGER NOT NULL DEFAULT 0,
+  steps_goal           INTEGER NOT NULL DEFAULT 0,
+  resting_hr_value     INTEGER NOT NULL DEFAULT 0,
+  resting_hr_caption   TEXT NOT NULL DEFAULT 'No data yet',
+  sleep_total          TEXT NOT NULL DEFAULT 'No data yet',
+  sleep_deep_caption   TEXT NOT NULL DEFAULT 'No data yet',
+  stress_level         TEXT NOT NULL DEFAULT 'No data yet',
+  stress_caption       TEXT NOT NULL DEFAULT 'No data yet'
 );
 
-INSERT INTO garmin_stats (
-  id, body_battery_value, body_battery_caption, steps_value, steps_goal,
-  resting_hr_value, resting_hr_caption, sleep_total, sleep_deep_caption,
-  stress_level, stress_caption
-) VALUES (
-  1, 48, 'Down from 62 this morning', 6240, 8000,
-  62, 'Normal range', '7h 15m', 'Deep: 1h 40m',
-  'Low', 'Avg today: 22'
-)
-ON CONFLICT (id) DO NOTHING;
+ALTER TABLE garmin_stats ALTER COLUMN body_battery_value SET DEFAULT 0;
+ALTER TABLE garmin_stats ALTER COLUMN body_battery_caption SET DEFAULT 'No data yet';
+ALTER TABLE garmin_stats ALTER COLUMN steps_value SET DEFAULT 0;
+ALTER TABLE garmin_stats ALTER COLUMN steps_goal SET DEFAULT 0;
+ALTER TABLE garmin_stats ALTER COLUMN resting_hr_value SET DEFAULT 0;
+ALTER TABLE garmin_stats ALTER COLUMN resting_hr_caption SET DEFAULT 'No data yet';
+ALTER TABLE garmin_stats ALTER COLUMN sleep_total SET DEFAULT 'No data yet';
+ALTER TABLE garmin_stats ALTER COLUMN sleep_deep_caption SET DEFAULT 'No data yet';
+ALTER TABLE garmin_stats ALTER COLUMN stress_level SET DEFAULT 'No data yet';
+ALTER TABLE garmin_stats ALTER COLUMN stress_caption SET DEFAULT 'No data yet';
+
+INSERT INTO garmin_stats (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+-- Real data now comes only from backend/python/garmin_sync.py -- reset a
+-- still-fake-seeded row to the neutral defaults above so it doesn't look
+-- like real (but stale) data. Guarded on the exact old fake caption, so
+-- this no-ops once a real sync (or this reset) has already overwritten it.
+UPDATE garmin_stats SET
+  body_battery_value = 0, body_battery_caption = 'No data yet',
+  steps_value = 0, steps_goal = 0,
+  resting_hr_value = 0, resting_hr_caption = 'No data yet',
+  sleep_total = 'No data yet', sleep_deep_caption = 'No data yet',
+  stress_level = 'No data yet', stress_caption = 'No data yet'
+WHERE id = 1 AND body_battery_caption = 'Down from 62 this morning';
 
 -- Migrate an existing demo-shaped table (fixed Tue->Mon rotation) to real dates.
 -- No-ops on a fresh DB (table/column don't exist yet) and on every run after
