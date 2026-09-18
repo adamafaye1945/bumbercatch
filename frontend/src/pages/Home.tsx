@@ -248,7 +248,12 @@ export function Home() {
         </>
       )}
 
-      <VoiceAssistPopup open={voiceOpen} onOpenChange={handleVoiceOpenChange} resultText={homeStatus.voiceResult} />
+      <VoiceAssistPopup
+        open={voiceOpen}
+        onOpenChange={handleVoiceOpenChange}
+        label={homeStatus.listening.label}
+        resultText={homeStatus.voiceResult}
+      />
     </div>
   );
 }

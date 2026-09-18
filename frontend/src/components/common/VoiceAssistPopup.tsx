@@ -5,10 +5,12 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 export function VoiceAssistPopup({
   open,
   onOpenChange,
+  label,
   resultText,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  label?: string;
   resultText?: string | null;
 }) {
   const resultLines = resultText ? resultText.split("\n").filter(Boolean) : [];
@@ -23,7 +25,7 @@ export function VoiceAssistPopup({
               <Mic className="size-6 text-white" />
             </div>
           </div>
-          <DialogTitle className="text-foreground">Listening…</DialogTitle>
+          <DialogTitle className="text-foreground">{label ?? "Listening…"}</DialogTitle>
           {resultLines.length > 0 && (
             <div className="flex flex-col gap-1 text-sm text-muted-foreground">
               {resultLines.map((line, i) => (

@@ -247,6 +247,7 @@ def main() -> None:
                     if pcm_bytes is None:
                         pass  # cancelled -- fall through to finally, nothing to transcribe
                     else:
+                        set_listening(True, "Processing...")
                         text = transcribe(whisper_model, pcm_bytes)
                         print(f"[voice] Heard: {text!r}")
 
