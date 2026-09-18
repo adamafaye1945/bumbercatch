@@ -22,7 +22,7 @@ export function AppShell() {
         aria-label="Refresh"
         disabled={refreshing}
         onClick={handleRefresh}
-        className="fixed left-3 top-3 z-50 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        className="fixed bottom-3 left-3 z-50 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
       >
         <RefreshCw className={cn("size-4", refreshing && "animate-spin")} />
       </button>
