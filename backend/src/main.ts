@@ -36,6 +36,29 @@ function startVoiceDaemon(): void {
   });
 }
 
+function runGarminSync(): Promise<void> {
+  return new Promise((resolve) => {
+    const pythonDir = path.join(__dirname, "../python");
+    const pythonBin = path.join(pythonDir, "venv", "bin", "python3");
+
+    if (!fs.existsSync(pythonBin)) {
+      console.warn(`[garmin] Skipping sync -- no venv at ${pythonBin}. See backend/python/requirements.txt.`);
+      resolve();
+      return;
+    }
+
+    const proc = spawn(pythonBin, ["garmin_sync.py"], { cwd: pythonDir, stdio: "inherit" });
+    proc.on("exit", (code) => {
+      if (code !== 0) console.warn(`[garmin] Sync exited with code ${code}`);
+      resolve();
+    });
+    proc.on("error", (err) => {
+      console.warn("[garmin] Failed to start sync:", err.message);
+      resolve();
+    });
+  });
+}
+
 function createWindow(): void {
   const win = new BrowserWindow({
     width: 420,
@@ -53,6 +76,8 @@ function createWindow(): void {
 }
 
 async function refreshAndNotify(): Promise<void> {
+  await runGarminSync();
+
   try {
     const { synced, newMessages } = await syncICloudEmails();
     await runNotificationRules(newMessages);
