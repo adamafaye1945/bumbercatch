@@ -37,8 +37,6 @@ export interface FavoritePlace {
 }
 
 export interface HomeStatus {
-  time: string;
-  date: string;
   weather: string;
   listening: { active: boolean; label: string };
   voiceResult: string | null;

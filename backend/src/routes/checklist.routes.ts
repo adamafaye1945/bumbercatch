@@ -24,3 +24,4 @@ checklistRouter.delete("/:id", async (req, res) => {
   await checklistService.deleteChecklistItem(req.params.id);
   res.status(204).send();
 });
+

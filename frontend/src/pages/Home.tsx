@@ -25,7 +25,17 @@ import {
   useReminders,
   useDismissReminder,
   useSnoozeReminder,
+  useOnCheck,
 } from "@/hooks/queries";
+
+function useNow(): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
 
 function formatDueAt(dueAt: string): string {
   return new Date(dueAt).toLocaleString(undefined, {
@@ -50,6 +60,7 @@ function formatTimeLeft(dueAt: string): string {
 }
 
 export function Home() {
+  const now = useNow();
   const queryClient = useQueryClient();
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -65,6 +76,7 @@ export function Home() {
   const dismissReminder = useDismissReminder();
   const snoozeReminder = useSnoozeReminder();
   const deleteChecklistItem = useDeleteChecklistItem();
+  const updateChecklistItem = useOnCheck()
 
   const isLoading =
     homeStatusRes.isLoading ||
@@ -144,9 +156,12 @@ export function Home() {
       </div>
 
       <div className="border-b border-border pb-6">
-        <div className="text-4xl font-semibold tabular-nums">{homeStatus.time}</div>
+        <div className="text-4xl font-semibold tabular-nums">
+          {now.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+        </div>
         <div className="mt-1 text-sm text-muted-foreground">
-          {homeStatus.date} · {homeStatus.weather}
+          {now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })} ·{" "}
+          {homeStatus.weather}
         </div>
       </div>
 
@@ -191,6 +206,7 @@ export function Home() {
               key={item.id}
               label={item.label}
               checked={item.checked}
+              onCheck={() => updateChecklistItem.mutate({ id: item.id, checked: !item.checked })}
               onDelete={() => deleteChecklistItem.mutate(item.id)}
             />
           ))}

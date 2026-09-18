@@ -3,8 +3,6 @@ import { buildUpdateSet } from "../utils/buildUpdateSet";
 import { HttpError } from "../utils/httpError";
 
 export interface HomeStatus {
-  time: string;
-  date: string;
   weather: string;
   listening: { active: boolean; label: string };
   voiceResult: string | null;
@@ -12,8 +10,6 @@ export interface HomeStatus {
 
 interface HomeStatusRow {
   id: number;
-  time: string;
-  date: string;
   weather: string;
   listening_active: boolean;
   listening_label: string;
@@ -22,8 +18,6 @@ interface HomeStatusRow {
 
 function toHomeStatus(row: HomeStatusRow): HomeStatus {
   return {
-    time: row.time,
-    date: row.date,
     weather: row.weather,
     listening: { active: row.listening_active, label: row.listening_label },
     voiceResult: row.voice_result,
@@ -38,8 +32,6 @@ export async function getHomeStatus(): Promise<HomeStatus> {
 
 export async function updateHomeStatus(data: Partial<HomeStatus>): Promise<HomeStatus> {
   const columnMap: Record<string, unknown> = {};
-  if (data.time !== undefined) columnMap.time = data.time;
-  if (data.date !== undefined) columnMap.date = data.date;
   if (data.weather !== undefined) columnMap.weather = data.weather;
   if (data.listening?.active !== undefined) columnMap.listening_active = data.listening.active;
   if (data.listening?.label !== undefined) columnMap.listening_label = data.listening.label;

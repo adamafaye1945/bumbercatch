@@ -66,8 +66,6 @@ ON CONFLICT (id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS home_status (
   id               INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  time             TEXT NOT NULL,
-  date             TEXT NOT NULL,
   weather          TEXT NOT NULL,
   listening_active BOOLEAN NOT NULL,
   listening_label  TEXT NOT NULL
@@ -82,10 +80,16 @@ ALTER TABLE home_status DROP COLUMN IF EXISTS leave_banner_action_label;
 -- VoiceAssistPopup before it closes. Null when idle/nothing to show.
 ALTER TABLE home_status ADD COLUMN IF NOT EXISTS voice_result TEXT;
 
+-- The clock is now rendered client-side from the device's own system clock
+-- (frontend/src/pages/Home.tsx) so it's always live -- these were static
+-- seeded strings that never updated ("7:42 AM" forever).
+ALTER TABLE home_status DROP COLUMN IF EXISTS time;
+ALTER TABLE home_status DROP COLUMN IF EXISTS date;
+
 INSERT INTO home_status (
-  id, time, date, weather, listening_active, listening_label
+  id, weather, listening_active, listening_label
 ) VALUES (
-  1, '7:42 AM', 'Monday, Sept 14', '68°F, clear', TRUE, 'Listening'
+  1, '68°F, clear', TRUE, 'Listening'
 )
 ON CONFLICT (id) DO NOTHING;
 

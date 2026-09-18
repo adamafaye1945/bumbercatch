@@ -10,16 +10,19 @@ export function ChecklistItem({
   checked,
   source,
   onDelete,
+  onCheck
 }: {
   label: string;
   checked: boolean;
   source?: ChecklistSource;
   onDelete?: () => void;
+  onCheck: ()=> void
+  
 }) {
   return (
     <div className="flex items-center gap-3 py-2.5">
       <label className="flex flex-1 items-center gap-3">
-        <Checkbox checked={checked} disabled />
+        <Checkbox checked={checked} onClick={onCheck} />
         <span className={cn("flex-1 text-sm", checked && "text-muted-foreground line-through")}>
           {label}
         </span>

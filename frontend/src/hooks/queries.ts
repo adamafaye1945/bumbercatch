@@ -26,7 +26,14 @@ export function useDeleteChecklistItem() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["checklist"] }),
   });
 }
-
+export function useOnCheck() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, checked }: { id: string; checked: boolean }) =>
+      apiFetch<ChecklistItem>(`/checklist/${id}`, { method: "PATCH", body: JSON.stringify({ checked }) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["checklist"] }),
+  });
+}
 export function useEmails() {
   return useQuery({
     queryKey: ["emails"],
