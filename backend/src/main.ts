@@ -10,6 +10,7 @@ import { runMigrations } from "./migrate";
 import { createServer } from "./server";
 import { syncICloudEmails } from "./icloud/sync";
 import { runNotificationRules } from "./notifications/rules";
+import { syncWeather } from "./services/weather.service";
 
 const API_PORT = process.env.API_PORT ? Number(process.env.API_PORT) : 4000;
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
@@ -84,6 +85,12 @@ async function refreshAndNotify(): Promise<void> {
     console.log(`[icloud] Sync complete (${synced} message(s), ${newMessages.length} new)`);
   } catch (err) {
     console.warn("[icloud] Sync/notify skipped:", err instanceof Error ? err.message : err);
+  }
+
+  try {
+    await syncWeather();
+  } catch (err) {
+    console.warn("[weather] Sync skipped:", err instanceof Error ? err.message : err);
   }
 }
 

@@ -12,8 +12,10 @@ import { ListRow } from "@/components/common/ListRow";
 import { ActionBanner } from "@/components/common/ActionBanner";
 import { ReminderPopup } from "@/components/common/ReminderPopup";
 import { VoiceAssistPopup } from "@/components/common/VoiceAssistPopup";
+import { WeatherPopup } from "@/components/common/WeatherPopup";
 import { LoadingState } from "@/components/common/LoadingState";
 import { DataUnavailable } from "@/components/common/DataUnavailable";
+import { iconToEmoji } from "@/lib/weather";
 import {
   useHomeStatus,
   useChecklist,
@@ -64,6 +66,7 @@ export function Home() {
   const queryClient = useQueryClient();
   const [voiceOpen, setVoiceOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
+  const [weatherOpen, setWeatherOpen] = useState(false);
   const wasListeningRef = useRef(false);
 
   const homeStatusRes = useHomeStatus();
@@ -161,7 +164,13 @@ export function Home() {
         </div>
         <div className="mt-1 text-sm text-muted-foreground">
           {now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })} ·{" "}
-          {homeStatus.weather}
+          <button
+            type="button"
+            onClick={() => setWeatherOpen(true)}
+            className="transition-colors hover:text-foreground"
+          >
+            {iconToEmoji(homeStatus.weatherIcon)} {homeStatus.weather}
+          </button>
         </div>
       </div>
 
@@ -254,6 +263,8 @@ export function Home() {
         label={homeStatus.listening.label}
         resultText={homeStatus.voiceResult}
       />
+
+      <WeatherPopup open={weatherOpen} onOpenChange={setWeatherOpen} />
     </div>
   );
 }

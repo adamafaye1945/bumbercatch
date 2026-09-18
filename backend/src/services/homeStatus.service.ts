@@ -4,6 +4,7 @@ import { HttpError } from "../utils/httpError";
 
 export interface HomeStatus {
   weather: string;
+  weatherIcon: string;
   listening: { active: boolean; label: string };
   voiceResult: string | null;
 }
@@ -11,6 +12,7 @@ export interface HomeStatus {
 interface HomeStatusRow {
   id: number;
   weather: string;
+  weather_icon: string;
   listening_active: boolean;
   listening_label: string;
   voice_result: string | null;
@@ -19,6 +21,7 @@ interface HomeStatusRow {
 function toHomeStatus(row: HomeStatusRow): HomeStatus {
   return {
     weather: row.weather,
+    weatherIcon: row.weather_icon,
     listening: { active: row.listening_active, label: row.listening_label },
     voiceResult: row.voice_result,
   };
@@ -33,6 +36,7 @@ export async function getHomeStatus(): Promise<HomeStatus> {
 export async function updateHomeStatus(data: Partial<HomeStatus>): Promise<HomeStatus> {
   const columnMap: Record<string, unknown> = {};
   if (data.weather !== undefined) columnMap.weather = data.weather;
+  if (data.weatherIcon !== undefined) columnMap.weather_icon = data.weatherIcon;
   if (data.listening?.active !== undefined) columnMap.listening_active = data.listening.active;
   if (data.listening?.label !== undefined) columnMap.listening_label = data.listening.label;
   if (data.voiceResult !== undefined) columnMap.voice_result = data.voiceResult;

@@ -86,12 +86,30 @@ ALTER TABLE home_status ADD COLUMN IF NOT EXISTS voice_result TEXT;
 ALTER TABLE home_status DROP COLUMN IF EXISTS time;
 ALTER TABLE home_status DROP COLUMN IF EXISTS date;
 
+-- Icon code (e.g. "01d") for the current conditions, alongside the existing
+-- `weather` text -- lets the header show an emoji, not just words.
+ALTER TABLE home_status ADD COLUMN IF NOT EXISTS weather_icon TEXT NOT NULL DEFAULT '01d';
+
 INSERT INTO home_status (
   id, weather, listening_active, listening_label
 ) VALUES (
-  1, '68°F, clear', TRUE, 'Listening'
+  1, 'Loading weather...', TRUE, 'Listening'
 )
 ON CONFLICT (id) DO NOTHING;
+
+-- Real conditions now come only from backend/src/services/weather.service.ts
+-- -- reset a still-fake-seeded row (guarded on the exact old fake string, so
+-- this no-ops once a real sync has already overwritten it).
+UPDATE home_status SET weather = 'Loading weather...' WHERE weather = '68°F, clear';
+
+CREATE TABLE IF NOT EXISTS weather_daily (
+  id          SERIAL PRIMARY KEY,
+  date        DATE NOT NULL UNIQUE,
+  temp_min    NUMERIC NOT NULL,
+  temp_max    NUMERIC NOT NULL,
+  description TEXT NOT NULL,
+  icon        TEXT NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS reminders (
   id           TEXT PRIMARY KEY,

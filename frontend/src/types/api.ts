@@ -38,8 +38,17 @@ export interface FavoritePlace {
 
 export interface HomeStatus {
   weather: string;
+  weatherIcon: string;
   listening: { active: boolean; label: string };
   voiceResult: string | null;
+}
+
+export interface WeatherDay {
+  date: string;
+  tempMin: number;
+  tempMax: number;
+  description: string;
+  icon: string;
 }
 
 export type ReminderSource = "manual" | "voice";

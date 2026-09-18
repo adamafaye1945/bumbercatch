@@ -10,6 +10,7 @@ import type {
   GarminWeeklyPoint,
   GarminMetric,
   Reminder,
+  WeatherDay,
 } from "@/types/api";
 
 export function useChecklist() {
@@ -110,6 +111,15 @@ export function useDismissReminder() {
   return useMutation({
     mutationFn: (id: string) => apiFetch<Reminder>(`/reminders/${id}/dismiss`, { method: "POST" }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reminders"] }),
+  });
+}
+
+export function useWeatherForecast() {
+  return useQuery({
+    queryKey: ["weather"],
+    queryFn: () => apiFetch<WeatherDay[]>("/weather"),
+    // Matches the backend's own refresh cadence (every 15 min).
+    refetchInterval: 15 * 60 * 1000,
   });
 }
 
