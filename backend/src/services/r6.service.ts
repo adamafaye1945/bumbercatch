@@ -106,10 +106,64 @@ interface FullStatsResponse {
   };
 }
 
-// Numeric rank IDs (e.g. 24) aren't documented against tier names (e.g.
-// "Platinum II") anywhere verifiable -- rather than guess a mapping and risk
-// showing a wrong tier, rank points (a real, directly comparable number) is
-// the primary displayed/sorted metric instead.
+// Sourced live from GET /r6/api/ranks?version=v7 (the current ranking system
+// as of season 43 / Y11S3) -- maps rank points to the tier name shown in-game,
+// far more reliable than guessing what the opaque numeric `rank` field means.
+const RANK_TIERS: Array<{ name: string; minMmr: number }> = [
+  { name: "Unranked", minMmr: 0 },
+  { name: "Copper 5", minMmr: 1000 },
+  { name: "Copper 4", minMmr: 1100 },
+  { name: "Copper 3", minMmr: 1200 },
+  { name: "Copper 2", minMmr: 1300 },
+  { name: "Copper 1", minMmr: 1400 },
+  { name: "Bronze 5", minMmr: 1500 },
+  { name: "Bronze 4", minMmr: 1600 },
+  { name: "Bronze 3", minMmr: 1700 },
+  { name: "Bronze 2", minMmr: 1800 },
+  { name: "Bronze 1", minMmr: 1900 },
+  { name: "Silver 5", minMmr: 2000 },
+  { name: "Silver 4", minMmr: 2100 },
+  { name: "Silver 3", minMmr: 2200 },
+  { name: "Silver 2", minMmr: 2300 },
+  { name: "Silver 1", minMmr: 2400 },
+  { name: "Gold 5", minMmr: 2500 },
+  { name: "Gold 4", minMmr: 2600 },
+  { name: "Gold 3", minMmr: 2700 },
+  { name: "Gold 2", minMmr: 2800 },
+  { name: "Gold 1", minMmr: 2900 },
+  { name: "Platinum 5", minMmr: 3000 },
+  { name: "Platinum 4", minMmr: 3100 },
+  { name: "Platinum 3", minMmr: 3200 },
+  { name: "Platinum 2", minMmr: 3300 },
+  { name: "Platinum 1", minMmr: 3400 },
+  { name: "Emerald 5", minMmr: 3500 },
+  { name: "Emerald 4", minMmr: 3600 },
+  { name: "Emerald 3", minMmr: 3700 },
+  { name: "Emerald 2", minMmr: 3800 },
+  { name: "Emerald 1", minMmr: 3900 },
+  { name: "Diamond 5", minMmr: 4000 },
+  { name: "Diamond 4", minMmr: 4100 },
+  { name: "Diamond 3", minMmr: 4200 },
+  { name: "Diamond 2", minMmr: 4300 },
+  { name: "Diamond 1", minMmr: 4400 },
+  { name: "Champion 5", minMmr: 4500 },
+  { name: "Champion 4", minMmr: 4600 },
+  { name: "Champion 3", minMmr: 4700 },
+  { name: "Champion 2", minMmr: 4800 },
+  { name: "Champion 1", minMmr: 4900 },
+  { name: "Legend Division", minMmr: 5000 },
+];
+
+function deriveRankName(rankPoints: number | null): string | null {
+  if (rankPoints === null) return null;
+  let name = RANK_TIERS[0].name;
+  for (const tier of RANK_TIERS) {
+    if (rankPoints >= tier.minMmr) name = tier.name;
+    else break;
+  }
+  return name;
+}
+
 function extractRankedProfile(data: FullStatsResponse): R6Profile | null {
   const boards = data.fullStats?.platform_families_full_profiles?.[0]?.board_ids_full_profiles ?? [];
   const ranked = boards.find((b) => b.board_id === "ranked");
@@ -148,14 +202,13 @@ export async function syncR6Stats(): Promise<void> {
         console.warn(`[r6] Unexpected response shape for "${gamertag}" -- raw: ${JSON.stringify(data).slice(0, 2000)}`);
       }
 
-      const rank = profile?.rank ?? null;
       const rankPoints = profile?.rank_points ?? null;
       const kills = profile?.kills ?? null;
       const deaths = profile?.deaths ?? null;
       const kdRatio = kills !== null && deaths ? Number((kills / deaths).toFixed(3)) : null;
       const wins = profile?.wins ?? null;
       const losses = profile?.losses ?? null;
-      const rankName = rank !== null ? `Rank ${rank}` : null;
+      const rankName = deriveRankName(rankPoints);
 
       await query(
         `INSERT INTO r6_stats (gamertag, rank_name, rank_points, kills, deaths, kd_ratio, wins, losses, synced_at)
