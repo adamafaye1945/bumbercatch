@@ -11,6 +11,7 @@ import type {
   GarminMetric,
   Reminder,
   WeatherDay,
+  R6PlayerStats,
 } from "@/types/api";
 
 export function useChecklist() {
@@ -120,6 +121,15 @@ export function useWeatherForecast() {
     queryFn: () => apiFetch<WeatherDay[]>("/weather"),
     // Matches the backend's own refresh cadence (every 15 min).
     refetchInterval: 15 * 60 * 1000,
+  });
+}
+
+export function useR6Leaderboard() {
+  return useQuery({
+    queryKey: ["r6-leaderboard"],
+    queryFn: () => apiFetch<R6PlayerStats[]>("/r6/leaderboard"),
+    // Backend only syncs once a day (rate-limit budget), so no aggressive
+    // polling here -- the default mount-time fetch is enough.
   });
 }
 

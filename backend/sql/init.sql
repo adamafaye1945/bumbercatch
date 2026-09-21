@@ -192,3 +192,24 @@ CREATE TABLE IF NOT EXISTS garmin_weekly_stats (
   value  NUMERIC NOT NULL,
   UNIQUE (metric, date)
 );
+
+-- Roster is reconciled from R6_PLAYERS in backend/.env on every sync
+-- (backend/src/services/r6.service.ts) -- this table is not seeded here.
+CREATE TABLE IF NOT EXISTS r6_players (
+  gamertag TEXT PRIMARY KEY,
+  platform TEXT NOT NULL
+);
+
+-- Nullable: a player can exist here (just reconciled in) before its first
+-- successful sync -- same reasoning as garmin_stats' neutral defaults.
+CREATE TABLE IF NOT EXISTS r6_stats (
+  gamertag    TEXT PRIMARY KEY REFERENCES r6_players(gamertag) ON DELETE CASCADE,
+  rank_name   TEXT,
+  rank_points INTEGER,
+  kills       INTEGER,
+  deaths      INTEGER,
+  kd_ratio    NUMERIC,
+  wins        INTEGER,
+  losses      INTEGER,
+  synced_at   TIMESTAMPTZ
+);

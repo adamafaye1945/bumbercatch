@@ -77,3 +77,15 @@ export interface GarminWeeklyPoint {
   date: string;
   value: number;
 }
+
+export interface R6PlayerStats {
+  gamertag: string;
+  platform: string;
+  rankName: string | null;
+  rankPoints: number | null;
+  kills: number | null;
+  deaths: number | null;
+  kdRatio: number | null;
+  wins: number | null;
+  losses: number | null;
+}

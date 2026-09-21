@@ -11,9 +11,11 @@ import { createServer } from "./server";
 import { syncICloudEmails } from "./icloud/sync";
 import { runNotificationRules } from "./notifications/rules";
 import { syncWeather } from "./services/weather.service";
+import { syncR6Stats } from "./services/r6.service";
 
 const API_PORT = process.env.API_PORT ? Number(process.env.API_PORT) : 4000;
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+const R6_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 let voiceProcess: ChildProcess | null = null;
 
@@ -94,6 +96,14 @@ async function refreshAndNotify(): Promise<void> {
   }
 }
 
+async function refreshR6(): Promise<void> {
+  try {
+    await syncR6Stats();
+  } catch (err) {
+    console.warn("[r6] Sync skipped:", err instanceof Error ? err.message : err);
+  }
+}
+
 app.whenReady().then(() => {
   createWindow();
 
@@ -104,12 +114,17 @@ app.whenReady().then(() => {
       console.log("[db] Schema migrations applied");
 
       await refreshAndNotify();
+      await refreshR6();
 
       createServer().listen(API_PORT, () => {
         console.log(`[api] Listening on http://localhost:${API_PORT}`);
       });
 
       setInterval(refreshAndNotify, REFRESH_INTERVAL_MS);
+      // R6's free tier is 2,000 calls/month and needs 2 calls per tracked
+      // player per sync -- a daily interval keeps well under budget even
+      // with a couple dozen players; the 15-min loop above would not.
+      setInterval(refreshR6, R6_REFRESH_INTERVAL_MS);
 
       startVoiceDaemon();
     })

@@ -8,6 +8,7 @@ import { EmailDetail } from "@/pages/EmailDetail";
 import { Garmin } from "@/pages/Garmin";
 import { Today } from "@/pages/Today";
 import { Places } from "@/pages/Places";
+import { R6Leaderboard } from "@/pages/R6Leaderboard";
 
 export function App() {
   return (
@@ -20,6 +21,7 @@ export function App() {
         <Route path="garmin" element={<Garmin />} />
         <Route path="today" element={<Today />} />
         <Route path="places" element={<Places />} />
+        <Route path="r6" element={<R6Leaderboard />} />
       </Route>
     </Routes>
   );

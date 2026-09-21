@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, Mail, HeartPulse, MapPin, RefreshCw, Trash2 } from "lucide-react";
+import { Bell, Mail, HeartPulse, MapPin, RefreshCw, Trash2, Trophy } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,7 @@ import {
   useDismissReminder,
   useSnoozeReminder,
   useOnCheck,
+  useR6Leaderboard,
 } from "@/hooks/queries";
 
 function useNow(): Date {
@@ -94,6 +95,10 @@ export function Home() {
   const snoozeReminder = useSnoozeReminder();
   const deleteChecklistItem = useDeleteChecklistItem();
   const updateChecklistItem = useOnCheck()
+  // Intentionally not part of the isLoading/isError gate below -- this is an
+  // optional bonus tile, so the rest of the dashboard shouldn't block or
+  // show DataUnavailable just because no R6 roster is configured yet.
+  const r6Res = useR6Leaderboard();
 
   const isLoading =
     homeStatusRes.isLoading ||
@@ -226,6 +231,13 @@ export function Home() {
           to="/email"
         />
         <StatTile label="Body battery" value={garminStats.bodyBattery.value} icon={HeartPulse} to="/garmin" />
+        <StatTile
+          label="R6 Leaderboard"
+          value={r6Res.data?.[0]?.gamertag ?? "No data"}
+          caption={r6Res.data?.[0]?.rankName ?? undefined}
+          icon={Trophy}
+          to="/r6"
+        />
       </StatGrid>
 
       {activeReminders.length > 0 && (

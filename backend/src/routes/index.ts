@@ -9,6 +9,7 @@ import { garminWeeklyRouter } from "./garminWeekly.routes";
 import { remindersRouter } from "./reminders.routes";
 import { voiceRouter } from "./voice.routes";
 import { weatherRouter } from "./weather.routes";
+import { r6Router } from "./r6.routes";
 
 export const apiRouter = Router();
 
@@ -22,3 +23,4 @@ apiRouter.use("/garmin-weekly", garminWeeklyRouter);
 apiRouter.use("/reminders", remindersRouter);
 apiRouter.use("/voice", voiceRouter);
 apiRouter.use("/weather", weatherRouter);
+apiRouter.use("/r6", r6Router);
