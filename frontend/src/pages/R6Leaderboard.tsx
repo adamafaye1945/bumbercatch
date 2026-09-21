@@ -6,6 +6,13 @@ import { LoadingState } from "@/components/common/LoadingState";
 import { DataUnavailable } from "@/components/common/DataUnavailable";
 import { useR6Leaderboard } from "@/hooks/queries";
 
+// A win percentage is directly comparable across players regardless of how
+// many games each has played, unlike raw win/loss counts.
+function formatWinRate(wins: number | null, losses: number | null): string | null {
+  if (wins === null || losses === null || wins + losses === 0) return null;
+  return `${Math.round((wins / (wins + losses)) * 100)}% win rate`;
+}
+
 export function R6Leaderboard() {
   const { data: players, isLoading, isError } = useR6Leaderboard();
 
@@ -27,7 +34,9 @@ export function R6Leaderboard() {
               titleRight={player.rankPoints !== null ? `${player.rankPoints} RP` : undefined}
               caption={
                 player.kdRatio !== null
-                  ? `K/D ${player.kdRatio.toFixed(2)} · ${player.wins ?? 0}W-${player.losses ?? 0}L`
+                  ? [`K/D ${player.kdRatio.toFixed(2)}`, formatWinRate(player.wins, player.losses)]
+                      .filter(Boolean)
+                      .join(" · ")
                   : undefined
               }
             />
