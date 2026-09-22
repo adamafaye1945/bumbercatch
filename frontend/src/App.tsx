@@ -9,6 +9,7 @@ import { Garmin } from "@/pages/Garmin";
 import { Today } from "@/pages/Today";
 import { Places } from "@/pages/Places";
 import { R6Leaderboard } from "@/pages/R6Leaderboard";
+import { Pomodoro } from "@/pages/Pomodoro";
 
 export function App() {
   return (
@@ -22,6 +23,7 @@ export function App() {
         <Route path="today" element={<Today />} />
         <Route path="places" element={<Places />} />
         <Route path="r6" element={<R6Leaderboard />} />
+        <Route path="pomodoro" element={<Pomodoro />} />
       </Route>
     </Routes>
   );

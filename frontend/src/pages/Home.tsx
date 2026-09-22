@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bell, Mail, HeartPulse, MapPin, RefreshCw, Trash2, Trophy } from "lucide-react";
+import { Bell, Mail, HeartPulse, MapPin, RefreshCw, Trash2, Trophy, Timer } from "lucide-react";
 
 import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -238,6 +238,7 @@ export function Home() {
           icon={Trophy}
           to="/r6"
         />
+        <StatTile label="Pomodoro" value="Study timer" icon={Timer} to="/pomodoro" />
       </StatGrid>
 
       {activeReminders.length > 0 && (
